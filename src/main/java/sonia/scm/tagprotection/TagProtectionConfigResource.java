@@ -47,7 +47,6 @@ import java.io.IOException;
 /**
  * @author Oliver Milke
  */
-@Singleton
 @Path("config/tagprotection")
 public class TagProtectionConfigResource {
 
