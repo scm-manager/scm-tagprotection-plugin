@@ -36,8 +36,8 @@
   <information>
     <author>Oliver Milke</author>
 
-    <url>https://bitbucket.org/omilke/tagprotection-plugin</url>
-    <wiki>https://bitbucket.org/sdorra/scm-manager/wiki/tagprotection-plugin</wiki>
+    <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
+    <wiki>https://github.com/cloudogu/scm-tagprotection-plugin/wiki</wiki>
   </information>
 
   <conditions>

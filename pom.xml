@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
-    <description>plugin description</description>
+    <description>This plugin enables configurable protection against removal of tags for repositories in SCM Manager.</description>
 
     <dependencies>
 
