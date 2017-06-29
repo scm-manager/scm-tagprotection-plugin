@@ -54,8 +54,9 @@ public class TagProtectionPreReceiveRepositoryHook {
 
                 logger.trace("Tag Protection does not need to be enforced.");
             }
-
+        } else {
             logger.warn("received hook without repository");
+
         }
     }
 
