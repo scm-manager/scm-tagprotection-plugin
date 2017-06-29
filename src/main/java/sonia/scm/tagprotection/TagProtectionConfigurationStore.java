@@ -1,6 +1,7 @@
 package sonia.scm.tagprotection;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class TagProtectionConfigurationStore {
 
     private final Store<TagProtectionConfig> store;
 
-
+    @Inject
     public TagProtectionConfigurationStore(StoreFactory factory) {
 
         store = factory.getStore(TagProtectionConfig.class, STORE_TYPE);
