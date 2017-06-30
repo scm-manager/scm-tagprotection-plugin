@@ -47,7 +47,7 @@ registerGeneralConfigPanel({
         name : 'reduce-owner-privilege',
         helpText: 'Owners are allowed to remove any tag in their repositories by default. However, when checked \n\
                they may only remove tags that are not protected, i. e. like regular users.',
-        inputValue: 'true',
+        inputValue: 'true'
     }],
 
     onSubmit: function(values){
