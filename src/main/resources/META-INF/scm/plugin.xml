@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "https://download.scm-manager.org/dtd/plugin/2.0.0-01.dtd">
 <!--
 
     Copyright (c) 2010, Sebastian Sdorra
@@ -44,12 +44,6 @@
     <min-version>${project.parent.version}</min-version>
   </conditions>
 
-  <packages>
-    <package>sonia.scm.tagprotection</package>
-  </packages>
-
-  <resources>
-    <script>/scm/sonia.tagprotection.js</script>
-  </resources>
+  <scm-version>2</scm-version>
 
 </plugin>

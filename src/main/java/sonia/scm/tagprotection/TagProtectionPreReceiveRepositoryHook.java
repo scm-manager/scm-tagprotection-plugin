@@ -1,14 +1,13 @@
 package sonia.scm.tagprotection;
 
-import com.google.common.eventbus.Subscribe;
+import com.github.legman.Subscribe;
 import com.google.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sonia.scm.EagerSingleton;
-import sonia.scm.event.Subscriber;
-import sonia.scm.plugin.ext.Extension;
+import sonia.scm.plugin.Extension;
 import sonia.scm.repository.PreReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.Tag;
@@ -16,12 +15,9 @@ import sonia.scm.user.User;
 
 import java.util.List;
 
-/**
- * @author Oliver Milke
- */
+
 @Extension
 @EagerSingleton
-@Subscriber(async = false)
 public class TagProtectionPreReceiveRepositoryHook {
 
     private static final Logger logger = LoggerFactory.getLogger(TagProtectionPreReceiveRepositoryHook.class);

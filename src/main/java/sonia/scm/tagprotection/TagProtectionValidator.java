@@ -3,8 +3,6 @@ package sonia.scm.tagprotection;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import org.apache.shiro.SecurityUtils;
-import sonia.scm.repository.PermissionType;
-import sonia.scm.repository.PermissionUtil;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.Tag;
 import sonia.scm.security.Role;
@@ -74,6 +72,8 @@ public class TagProtectionValidator {
      */
     private boolean currentUserHasAdminPrivilege(Repository repository) {
 
+//        TODO: We here need a new type of permission - something like 'OverrideTagProtectionPermission'
+
         if (SecurityUtils.getSubject().hasRole(Role.ADMIN)) {
 
             //Admin may always delete tags
@@ -81,8 +81,8 @@ public class TagProtectionValidator {
         }
 
         //Owner may always delete tags in their repositories, unless the plugin configuration disables this
-        boolean userIsOwner = PermissionUtil.hasPermission(null, repository, PermissionType.OWNER);
-        return userIsOwner && !isReduceOwnerPrivilege();
+//        boolean userIsOwner = PermissionUtil.hasPermission(null, repository, PermissionType.OWNER);
+        return false;
 
     }
 
