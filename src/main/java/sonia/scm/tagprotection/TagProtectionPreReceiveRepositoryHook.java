@@ -30,7 +30,7 @@ public class TagProtectionPreReceiveRepositoryHook {
         this.tagProtectionValidator = tagProtectionValidator;
     }
 
-    @Subscribe
+    @Subscribe(async = false)
     public void onEvent(PreReceiveRepositoryHookEvent event) {
 
         Repository repository = event.getRepository();
