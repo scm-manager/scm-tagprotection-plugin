@@ -7,6 +7,7 @@ import sonia.scm.api.v2.resources.LinkBuilder;
 import sonia.scm.api.v2.resources.LinkEnricher;
 import sonia.scm.api.v2.resources.LinkEnricherContext;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
+import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.plugin.Extension;
 
 import javax.inject.Inject;
@@ -24,7 +25,9 @@ public class TagProtectionIndexLinkEnricher implements LinkEnricher {
 
     @Override
     public void enrich(LinkEnricherContext context, LinkAppender appender) {
-        appender.appendOne("tagProtection", createLink());
+        if (ConfigurationPermissions.read("tagProtection").isPermitted()) {
+            appender.appendOne("tagProtection", createLink());
+        }
     }
 
     private String createLink() {

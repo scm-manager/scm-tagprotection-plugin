@@ -18,6 +18,7 @@ import javax.inject.Provider;
 import java.net.URI;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TagProtectionIndexLinkEnricherTest {
@@ -44,9 +45,19 @@ public class TagProtectionIndexLinkEnricherTest {
             configuration = "classpath:sonia/scm/tagprotection/shiro.ini"
     )
     @Test
-    public void testEnrich() {
+    public void shouldEnrich() {
         enricher.enrich(LinkEnricherContext.of(), appender);
         verify(appender).appendOne("tagProtection", "https://scm-manager.org/scm/api/v2/config/tagprotection/");
     }
 
+    @SubjectAware(
+            username = "unpriv",
+            password = "secret",
+            configuration = "classpath:sonia/scm/tagprotection/shiro.ini"
+    )
+    @Test
+    public void shouldNotEnrichIfNotPermitted() {
+        enricher.enrich(LinkEnricherContext.of(), appender);
+        verifyZeroInteractions(appender);
+    }
 }
