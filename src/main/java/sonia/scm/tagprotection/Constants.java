@@ -1,5 +1,9 @@
 package sonia.scm.tagprotection;
 
-public class Constants {
-    public static final String NAME = "tagProtection";
+class Constants {
+
+    private Constants() {
+    }
+
+    static final String NAME = "tagProtection";
 }
