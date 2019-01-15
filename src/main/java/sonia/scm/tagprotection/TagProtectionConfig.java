@@ -32,6 +32,9 @@
 package sonia.scm.tagprotection;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -40,6 +43,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "tagprotection-config")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Getter
+@Setter
 public class TagProtectionConfig {
 
     @XmlElement(name = "reduce-owner-privilege")
@@ -49,24 +54,4 @@ public class TagProtectionConfig {
     @XmlElement(name = "protection-pattern")
     private String protectionPattern = "";
 
-
-    public boolean isReduceOwnerPrivilege() {
-
-        return reduceOwnerPrivilege;
-    }
-
-    public void setReduceOwnerPrivilege(boolean reduceOwnerPrivilege) {
-
-        this.reduceOwnerPrivilege = reduceOwnerPrivilege;
-    }
-
-    public String getProtectionPattern() {
-
-        return protectionPattern;
-    }
-
-    public void setProtectionPattern(String protectionPattern) {
-
-        this.protectionPattern = protectionPattern;
-    }
 }

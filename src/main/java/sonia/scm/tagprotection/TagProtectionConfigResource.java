@@ -30,44 +30,41 @@
 
 package sonia.scm.tagprotection;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
 
 @Path("v2/config/tagprotection")
 public class TagProtectionConfigResource {
     private final TagProtectionConfigurationStore configurationStore;
-
+    private final TagProtectionConfigMapper mapper;
 
     @Inject
-    public TagProtectionConfigResource(TagProtectionConfigurationStore configurationStore) {
+    public TagProtectionConfigResource(TagProtectionConfigurationStore configurationStore, TagProtectionConfigMapper mapper) {
 
         this.configurationStore = configurationStore;
+        this.mapper = mapper;
     }
 
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public TagProtectionConfig getConfig() {
+    public TagProtectionConfigDto getConfig() {
 
-        return configurationStore.getConfiguration();
+        return mapper.map(configurationStore.getConfiguration());
     }
 
-    @POST
+    @PUT
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfig config) {
+    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfigDto config) {
 
-        configurationStore.saveConfiguration(config);
+        configurationStore.saveConfiguration(mapper.map(config));
 
         return Response.noContent().build();
     }

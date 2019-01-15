@@ -25,7 +25,7 @@ public class TagProtectionIndexLinkEnricher implements LinkEnricher {
 
     @Override
     public void enrich(LinkEnricherContext context, LinkAppender appender) {
-        if (ConfigurationPermissions.read("tagProtection").isPermitted()) {
+        if (ConfigurationPermissions.read(Constants.NAME).isPermitted()) {
             appender.appendOne("tagProtection", createLink());
         }
     }
