@@ -56,7 +56,7 @@ public class TagProtectionConfigResource {
 
     @GET
     @Path("/")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces(MediaType.APPLICATION_JSON)
     public TagProtectionConfig getConfig() {
 
         return configurationStore.getConfiguration();
@@ -64,7 +64,7 @@ public class TagProtectionConfigResource {
 
     @POST
     @Path("/")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfig config) {
 
         configurationStore.saveConfiguration(config);
