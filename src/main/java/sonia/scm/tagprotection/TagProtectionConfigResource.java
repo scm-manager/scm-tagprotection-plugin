@@ -31,6 +31,7 @@
 package sonia.scm.tagprotection;
 
 import com.google.inject.Inject;
+import sonia.scm.config.ConfigurationPermissions;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -55,7 +56,7 @@ public class TagProtectionConfigResource {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public TagProtectionConfigDto getConfig() {
-
+        ConfigurationPermissions.read(Constants.NAME).check();
         return mapper.map(configurationStore.getConfiguration());
     }
 
@@ -63,7 +64,7 @@ public class TagProtectionConfigResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfigDto config) {
-
+        ConfigurationPermissions.write(Constants.NAME).check();
         configurationStore.saveConfiguration(mapper.map(config));
 
         return Response.noContent().build();
