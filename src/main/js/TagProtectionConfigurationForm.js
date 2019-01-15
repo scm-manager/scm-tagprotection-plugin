@@ -1,8 +1,8 @@
 // @flow
+import React from "react";
 import { translate } from "react-i18next";
 import type { TagProtectionConfiguration } from "./TagProtectionConfiguration";
-import InputField from "@scm-manager/ui-components/src/forms/InputField";
-import Checkbox from "@scm-manager/ui-components/src/forms/Checkbox";
+import { InputField, Checkbox } from "@scm-manager/ui-components";
 
 type Props = {
   initialConfiguration: TagProtectionConfiguration,
