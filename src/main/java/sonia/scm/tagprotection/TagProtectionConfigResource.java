@@ -1,10 +1,10 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of SCM-Manager; nor the names of its
  * contributors may be used to endorse or promote products derived from this
  * software without specific prior written permission.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,7 +24,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
  */
 
@@ -42,13 +42,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 
-//~--- JDK imports ------------------------------------------------------------
-
-/**
- * @author Oliver Milke
- */
-@Path("config/tagprotection")
+@Path("v2/config/tagprotection")
 public class TagProtectionConfigResource {
+    private final TagProtectionConfigurationStore configurationStore;
+
 
     @Inject
     public TagProtectionConfigResource(TagProtectionConfigurationStore configurationStore) {
@@ -56,28 +53,24 @@ public class TagProtectionConfigResource {
         this.configurationStore = configurationStore;
     }
 
-    //~--- get methods ----------------------------------------------------------
 
     @GET
+    @Path("/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public TagProtectionConfig getConfig() {
 
         return configurationStore.getConfiguration();
     }
 
-    //~--- set methods ----------------------------------------------------------
-
     @POST
+    @Path("/")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfig config) throws IOException {
+    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfig config) {
 
         configurationStore.saveConfiguration(config);
 
         return Response.noContent().build();
     }
 
-    //~--- fields ---------------------------------------------------------------
-
-    private final TagProtectionConfigurationStore configurationStore;
 
 }
