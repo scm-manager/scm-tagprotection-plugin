@@ -3,9 +3,10 @@ package sonia.scm.tagprotection;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import org.apache.shiro.SecurityUtils;
+import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.repository.Repository;
+import sonia.scm.repository.RepositoryPermissions;
 import sonia.scm.repository.Tag;
-import sonia.scm.security.Role;
 import sonia.scm.util.GlobUtil;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class TagProtectionValidator {
             return false;
         }
 
-        if (currentUserHasAdminPrivilege(repository)) {
+        if (currentUserHasDeletePrivilege(repository)) {
             return false;
         }
 
@@ -70,19 +71,18 @@ public class TagProtectionValidator {
      * @param repository The repository to remove a tag from.
      * @return Returns {@code true}, if the user can generally remove tags in this repository, effectively ignoring the protection pattern.
      */
-    private boolean currentUserHasAdminPrivilege(Repository repository) {
+    private boolean currentUserHasDeletePrivilege(Repository repository) {
 
-//        TODO: We here need a new type of permission - something like 'OverrideTagProtectionPermission'
-
-        if (SecurityUtils.getSubject().hasRole(Role.ADMIN)) {
+        if (ConfigurationPermissions.write(Constants.NAME).isPermitted()) {
 
             //Admin may always delete tags
             return true;
         }
 
-        //Owner may always delete tags in their repositories, unless the plugin configuration disables this
-//        boolean userIsOwner = PermissionUtil.hasPermission(null, repository, PermissionType.OWNER);
-        return false;
+        // Admins may always delete tags in their repositories (permission repository:<id>:modify),
+        // unless the plugin configuration disables this
+        boolean userIsOwner = RepositoryPermissions.modify(repository).isPermitted();
+        return userIsOwner && !isReduceOwnerPrivilege();
 
     }
 
