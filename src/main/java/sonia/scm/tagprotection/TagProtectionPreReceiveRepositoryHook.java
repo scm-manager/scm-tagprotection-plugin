@@ -43,8 +43,9 @@ public class TagProtectionPreReceiveRepositoryHook {
             if (tagsMustBeProtected) {
 
                 User user = subject.getPrincipals().oneByType(User.class);
-                String message = String.format("Deleting tags not allowed for user %s in repository %s", user.getName(), repository.getName());
+                String message = String.format("Deleting tags not allowed for user %s in repository %s/%s", user.getName(), repository.getNamespace(), repository.getName());
                 logger.info(message);
+                event.getContext().getMessageProvider().sendMessage(message);
                 throw new TagProtectionException(message);
             } else {
 
