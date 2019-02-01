@@ -1,9 +1,9 @@
 {
   "scm-tagProtection-plugin": {
-    "nav-link": "Git Tag Protection",
+    "nav-link": "Tag Protection",
     "config": {
       "form": {
-        "header": "Git Tag Protection",
+        "header": "Tag Protection",
         "protectionPattern": "Protection pattern",
         "protectionPattern-helptext": "A wildcard pattern to describe the tags that are protected from removal. Use * or ? as wildcards.",
         "reduceOwnerPrivilege": "Reduce owner privilege",
