@@ -1,4 +1,4 @@
-package sonia.scm.redmine;
+package sonia.scm.tagprotection;
 
 import com.github.sdorra.shiro.ShiroRule;
 import com.github.sdorra.shiro.SubjectAware;
@@ -12,7 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import sonia.scm.api.v2.resources.LinkAppender;
 import sonia.scm.api.v2.resources.LinkEnricherContext;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
-import sonia.scm.tagprotection.TagProtectionIndexLinkEnricher;
 
 import javax.inject.Provider;
 import java.net.URI;

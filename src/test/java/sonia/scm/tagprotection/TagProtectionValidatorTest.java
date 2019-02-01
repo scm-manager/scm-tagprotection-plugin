@@ -2,16 +2,11 @@ package sonia.scm.tagprotection;
 
 import com.github.sdorra.shiro.ShiroRule;
 import com.github.sdorra.shiro.SubjectAware;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.Tag;
-import sonia.scm.security.RepositoryPermission;
-import sonia.scm.security.Role;
 
 import java.util.ArrayList;
 import java.util.Collections;

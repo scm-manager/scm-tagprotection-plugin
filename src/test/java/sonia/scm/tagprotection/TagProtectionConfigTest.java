@@ -9,9 +9,8 @@ import static com.google.common.truth.Truth.assertThat;
  */
 public class TagProtectionConfigTest {
 
-
     @Test
-    public void verifyDefaultValues() throws Exception {
+    public void verifyDefaultValues() {
 
         TagProtectionConfig config = new TagProtectionConfig();
 
