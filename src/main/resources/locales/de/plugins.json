@@ -1,13 +1,13 @@
 {
   "scm-tagProtection-plugin": {
-    "nav-link": "Schützen von Tags",
+    "nav-link": "Git Tag Protection",
     "config": {
       "form": {
-        "header": "Schützen von Tag",
-        "protectionPattern": "Muster zum Schützen",
-        "protectionPattern-helptext": "Ein Platzhalter Muster, das beschreibt welche Tags vor dem Löschen geschützt werden. * oder ? können als Platzhalter verwendet werden.",
+        "header": "Git Tag Protection",
+        "protectionPattern": "Muster für die zu schützenden Git Tags",
+        "protectionPattern-helptext": "Ein Platzhalter Muster, das beschreibt, welche Git Tags vor dem Löschen geschützt werden. * oder ? können als Platzhalter verwendet werden.",
         "reduceOwnerPrivilege": "Reduzierung der Berechtigungen des Owners",
-        "reduceOwnerPrivilege-helptext": "Benutzer die die Berechtigung haben ein Repository zu verändern (z.B. Owner), können jeden Tag in dem Repository entfernen. Geschützte Tags können jedoch auch von diesen Benutzern nicht entfernt werden."
+        "reduceOwnerPrivilege-helptext": "Benutzer, die die Berechtigung haben ein Repository zu verändern (z.B. Owner), können jeden Tag in dem Repository entfernen. Geschützte Tags können jedoch auch von diesen Benutzern nicht entfernt werden."
       }
     }
   }
