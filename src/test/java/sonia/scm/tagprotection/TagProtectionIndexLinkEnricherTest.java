@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import sonia.scm.api.v2.resources.LinkAppender;
-import sonia.scm.api.v2.resources.LinkEnricherContext;
+import sonia.scm.api.v2.resources.HalAppender;
+import sonia.scm.api.v2.resources.HalEnricherContext;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
 
 import javax.inject.Provider;
@@ -26,7 +26,7 @@ public class TagProtectionIndexLinkEnricherTest {
     public ShiroRule shiro = new ShiroRule();
 
     @Mock
-    private LinkAppender appender;
+    private HalAppender appender;
 
     private TagProtectionIndexLinkEnricher enricher;
 
@@ -45,8 +45,8 @@ public class TagProtectionIndexLinkEnricherTest {
     )
     @Test
     public void shouldEnrich() {
-        enricher.enrich(LinkEnricherContext.of(), appender);
-        verify(appender).appendOne("tagProtection", "https://scm-manager.org/scm/api/v2/config/tagprotection/");
+        enricher.enrich(HalEnricherContext.of(), appender);
+        verify(appender).appendLink("tagProtection", "https://scm-manager.org/scm/api/v2/config/tagprotection/");
     }
 
     @SubjectAware(
@@ -56,7 +56,7 @@ public class TagProtectionIndexLinkEnricherTest {
     )
     @Test
     public void shouldNotEnrichIfNotPermitted() {
-        enricher.enrich(LinkEnricherContext.of(), appender);
+        enricher.enrich(HalEnricherContext.of(), appender);
         verifyZeroInteractions(appender);
     }
 }
