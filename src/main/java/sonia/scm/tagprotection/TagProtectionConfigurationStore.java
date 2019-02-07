@@ -6,15 +6,13 @@ import com.google.inject.Singleton;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sonia.scm.store.Store;
-import sonia.scm.store.StoreFactory;
+import sonia.scm.store.ConfigurationStore;
+import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.user.User;
 
 import java.util.Objects;
 
-/**
- * @author Oliver Milke
- */
+
 @Singleton
 public class TagProtectionConfigurationStore {
 
@@ -24,12 +22,12 @@ public class TagProtectionConfigurationStore {
     @VisibleForTesting
     static final String STORE_TYPE = "tagprotection";
 
-    private final Store<TagProtectionConfig> store;
+    private final ConfigurationStore<TagProtectionConfig> store;
 
     @Inject
-    public TagProtectionConfigurationStore(StoreFactory factory) {
+    public TagProtectionConfigurationStore(ConfigurationStoreFactory factory) {
 
-        store = factory.getStore(TagProtectionConfig.class, STORE_TYPE);
+        store = factory.withType(TagProtectionConfig.class).withName(STORE_TYPE).build();
     }
 
     /**

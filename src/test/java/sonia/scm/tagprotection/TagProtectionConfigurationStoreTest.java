@@ -7,8 +7,9 @@ import org.apache.shiro.util.ThreadContext;
 import org.junit.Before;
 import org.junit.Test;
 import sonia.scm.security.Role;
-import sonia.scm.store.Store;
-import sonia.scm.store.StoreFactory;
+import sonia.scm.store.ConfigurationStore;
+import sonia.scm.store.ConfigurationStoreFactory;
+import sonia.scm.store.InMemoryConfigurationStoreFactory;
 import sonia.scm.user.User;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -23,17 +24,15 @@ public class TagProtectionConfigurationStoreTest {
     private static final String ADMIN_USER_NAME = "AdminUser";
 
     private TagProtectionConfigurationStore cut;
-    private Store<TagProtectionConfig> mockedStore;
+    private ConfigurationStore<TagProtectionConfig> mockedStore;
 
     @Before
     public void prepareTest() {
 
-        StoreFactory mockedFactory = mock(StoreFactory.class);
+        mockedStore = mock(ConfigurationStore.class);
+        ConfigurationStoreFactory factory = new InMemoryConfigurationStoreFactory(mockedStore);
 
-        mockedStore = mock(Store.class);
-        when(mockedFactory.getStore(TagProtectionConfig.class, TagProtectionConfigurationStore.STORE_TYPE)).thenReturn(mockedStore);
-
-        cut = new TagProtectionConfigurationStore(mockedFactory);
+        cut = new TagProtectionConfigurationStore(factory);
     }
 
     @Test

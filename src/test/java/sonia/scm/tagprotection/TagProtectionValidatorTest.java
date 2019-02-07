@@ -1,14 +1,12 @@
 package sonia.scm.tagprotection;
 
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
+import com.github.sdorra.shiro.ShiroRule;
+import com.github.sdorra.shiro.SubjectAware;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.Tag;
-import sonia.scm.security.RepositoryPermission;
-import sonia.scm.security.Role;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +19,13 @@ import static org.mockito.Mockito.when;
 /**
  * @author Oliver Milke
  */
+@SubjectAware(configuration = "classpath:sonia/scm/tagprotection/shiro.ini")
 public class TagProtectionValidatorTest {
+
+    private static final Repository REPOSITORY = new Repository("id", "git", "space", "X");
+
+    @Rule
+    public ShiroRule shiroRule = new ShiroRule();
 
     private TagProtectionConfig preparedConfiguration;
     private TagProtectionValidator cut;
@@ -39,87 +43,80 @@ public class TagProtectionValidatorTest {
     }
 
     @Test
+    @SubjectAware(username = "trillian", password = "secret")
     public void assertThatAdminCanRemoveProtectedTags() {
 
-        setAdminRole();
-
         preparedConfiguration.setProtectionPattern("t1");
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //pattern configured and matching a given tag. But user is admin, hence no protection needed
         assertThat(result).isFalse();
     }
 
     @Test
+    @SubjectAware(username = "marvin", password = "secret")
     public void assertThatOwnerCanRemoveTags() {
-
-        setOwnerRole();
 
         preparedConfiguration.setProtectionPattern("t1");
         preparedConfiguration.setReduceOwnerPrivilege(false);
 
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //pattern configured and matching a given tag. But user is Owner and privilege reduction is not configured, hence no protection needed
         assertThat(result).isFalse();
     }
 
     @Test
+    @SubjectAware(username = "marvin", password = "secret")
     public void assertThatReducedOwnerCannotRemoveTags() {
-
-        setOwnerRole();
 
         preparedConfiguration.setProtectionPattern("t1");
         preparedConfiguration.setReduceOwnerPrivilege(true);
 
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //pattern configured and matching a given tag. But user is Owner, but reduction is configured, hence  protection is needed
         assertThat(result).isTrue();
     }
 
     @Test
+    @SubjectAware(username = "unpriv", password = "secret")
     public void assertThatEmptyTagListRequiresNoProtection() throws Exception {
 
-        setRegularUserRole();
-
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), Collections.EMPTY_LIST);
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, Collections.EMPTY_LIST);
 
         //no tags to handle, no protection needed
         assertThat(result).isFalse();
     }
 
     @Test
+    @SubjectAware(username = "unpriv", password = "secret")
     public void assertThatEmptyPatternRequiresNoProtection() {
 
-        setRegularUserRole();
-
         preparedConfiguration.setProtectionPattern("");
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //no pattern configured, no protection needed
         assertThat(result).isFalse();
     }
 
     @Test
+    @SubjectAware(username = "unpriv", password = "secret")
     public void assertThatNonMatchingPatternRequiresNoProtection() {
 
-        setRegularUserRole();
-
         preparedConfiguration.setProtectionPattern("any");
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //configured pattern does not match any of the tags, no protection needed
         assertThat(result).isFalse();
     }
 
     @Test
+    @SubjectAware(username = "unpriv", password = "secret")
     public void assertThatMatchingPatternRequiresProtection() {
 
-        setRegularUserRole();
-
         preparedConfiguration.setProtectionPattern("t1");
-        boolean result = cut.tagsMustBeProtected(mock(Repository.class), tagsOf("t1", "t2"));
+        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
 
         //no pattern configured, no protection needed
         assertThat(result).isTrue();
@@ -151,37 +148,6 @@ public class TagProtectionValidatorTest {
 
         //these are just some basic test, assuming GlobUtil is extensively tested
     }
-
-    private void setOwnerRole() {
-
-        Subject ownerSubject = mock(Subject.class);
-        when(ownerSubject.hasRole(Role.ADMIN)).thenReturn(false);
-        when(ownerSubject.isAuthenticated()).thenReturn(true);
-        when(ownerSubject.getPrincipal()).thenReturn("principal");
-        when(ownerSubject.isPermitted(new RepositoryPermission((String) null, PermissionType.OWNER))).thenReturn(true);
-
-        ThreadContext.bind(ownerSubject);
-    }
-
-    private void setRegularUserRole() {
-
-        Subject ownerSubject = mock(Subject.class);
-        when(ownerSubject.hasRole(Role.ADMIN)).thenReturn(false);
-        when(ownerSubject.isAuthenticated()).thenReturn(true);
-        when(ownerSubject.getPrincipal()).thenReturn("principal");
-        when(ownerSubject.isPermitted(new RepositoryPermission((String) null, PermissionType.OWNER))).thenReturn(false);
-
-        ThreadContext.bind(ownerSubject);
-    }
-
-    private void setAdminRole() {
-
-        Subject adminSubject = mock(Subject.class);
-        when(adminSubject.hasRole(Role.ADMIN)).thenReturn(true);
-
-        ThreadContext.bind(adminSubject);
-    }
-
 
     private List<Tag> tagsOf(String... names) {
 

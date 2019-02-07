@@ -6,14 +6,14 @@
     <parent>
         <artifactId>scm-plugins</artifactId>
         <groupId>sonia.scm.plugins</groupId>
-        <version>1.53</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>sonia.scm.plugins</groupId>
     <artifactId>scm-tagprotection-plugin</artifactId>
-    <packaging>jar</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
+    <packaging>smp</packaging>
     <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
     <description>This plugin enables configurable protection against removal of tags for repositories in SCM Manager.</description>
 
@@ -25,15 +25,6 @@
     </scm>
 
     <dependencies>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- test scope -->
 
         <dependency>
             <groupId>sonia.scm</groupId>
@@ -69,16 +60,6 @@
 
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>sonia.scm.maven</groupId>
-                <artifactId>scm-maven-plugin</artifactId>
-                <version>1.30</version>
-                <configuration>
-                    <loggginConfiguration>src/main/conf/logging.xml</loggginConfiguration>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -109,5 +90,39 @@
         </repository>
 
     </repositories>
+
+    <profiles>
+        <profile>
+            <!-- If enabled, explicitly disables other profiles (i.e. link-ui). -->
+            <id>ci</id>
+        </profile>
+
+        <profile>
+            <id>link-ui</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>sonia.scm.maven</groupId>
+                        <artifactId>smp-maven-plugin</artifactId>
+                        <version>1.0.0-alpha-3</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <links>
+                                <link>@scm-manager/ui-types</link>
+                                <link>@scm-manager/ui-components</link>
+                            </links>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+
+        </profile>
+    </profiles>
 
 </project>

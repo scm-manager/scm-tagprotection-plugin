@@ -1,10 +1,10 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  * 3. Neither the name of SCM-Manager; nor the names of its
  * contributors may be used to endorse or promote products derived from this
  * software without specific prior written permission.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,60 +24,51 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
  */
 
 package sonia.scm.tagprotection;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import sonia.scm.config.ConfigurationPermissions;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
 
-//~--- JDK imports ------------------------------------------------------------
-
-/**
- * @author Oliver Milke
- */
-@Path("config/tagprotection")
+@Path("v2/config/tagprotection")
 public class TagProtectionConfigResource {
+    private final TagProtectionConfigurationStore configurationStore;
+    private final TagProtectionConfigMapper mapper;
 
     @Inject
-    public TagProtectionConfigResource(TagProtectionConfigurationStore configurationStore) {
+    public TagProtectionConfigResource(TagProtectionConfigurationStore configurationStore, TagProtectionConfigMapper mapper) {
 
         this.configurationStore = configurationStore;
+        this.mapper = mapper;
     }
 
-    //~--- get methods ----------------------------------------------------------
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public TagProtectionConfig getConfig() {
-
-        return configurationStore.getConfiguration();
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public TagProtectionConfigDto getConfig() {
+        ConfigurationPermissions.read(Constants.NAME).check();
+        return mapper.map(configurationStore.getConfiguration());
     }
 
-    //~--- set methods ----------------------------------------------------------
-
-    @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfig config) throws IOException {
-
-        configurationStore.saveConfiguration(config);
+    @PUT
+    @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setConfig(@Context UriInfo uriInfo, TagProtectionConfigDto config) {
+        ConfigurationPermissions.write(Constants.NAME).check();
+        configurationStore.saveConfiguration(mapper.map(config));
 
         return Response.noContent().build();
     }
 
-    //~--- fields ---------------------------------------------------------------
-
-    private final TagProtectionConfigurationStore configurationStore;
 
 }
