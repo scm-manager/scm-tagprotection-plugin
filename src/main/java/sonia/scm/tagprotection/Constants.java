@@ -5,5 +5,5 @@ class Constants {
     private Constants() {
     }
 
-    static final String NAME = "tagProtection";
+    static final String NAME = "tagprotection";
 }
