@@ -6,7 +6,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.Before;
 import org.junit.Test;
-import sonia.scm.security.Role;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.store.InMemoryConfigurationStoreFactory;
@@ -86,9 +85,7 @@ public class TagProtectionConfigurationStoreTest {
     }
 
     private void setAdminRole() {
-
         Subject adminSubject = mock(Subject.class);
-        when(adminSubject.hasRole(Role.ADMIN)).thenReturn(true);
 
         //provide a username for the subject
         PrincipalCollection mockedPrincipals = mock(PrincipalCollection.class);
