@@ -14,6 +14,7 @@ import sonia.scm.user.User;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static sonia.scm.tagprotection.TagProtectionConfigurationStore.STORE_TYPE;
 
 /**
  * @author Oliver Milke
@@ -28,8 +29,8 @@ public class TagProtectionConfigurationStoreTest {
     @Before
     public void prepareTest() {
 
-        mockedStore = mock(ConfigurationStore.class);
-        ConfigurationStoreFactory factory = new InMemoryConfigurationStoreFactory(mockedStore);
+        ConfigurationStoreFactory factory = new InMemoryConfigurationStoreFactory();
+        mockedStore = factory.withType(TagProtectionConfig.class).withName(STORE_TYPE).build();
 
         cut = new TagProtectionConfigurationStore(factory);
     }
@@ -37,7 +38,6 @@ public class TagProtectionConfigurationStoreTest {
     @Test
     public void assertThatDefaultConfigurationIsProvided() {
 
-        when(mockedStore.get()).thenReturn(null);
         TagProtectionConfig configuration = cut.getConfiguration();
 
         //prove that without a persisted configuration, the values match with the default values as defined by TagProtectionConfig
@@ -50,7 +50,7 @@ public class TagProtectionConfigurationStoreTest {
     public void assertThatPersistedConfigurationIsProvided() {
 
         TagProtectionConfig persistedConfiguration = new TagProtectionConfig();
-        when(mockedStore.get()).thenReturn(persistedConfiguration);
+        mockedStore.set(persistedConfiguration);
 
         TagProtectionConfig configuration = cut.getConfiguration();
 
@@ -62,10 +62,7 @@ public class TagProtectionConfigurationStoreTest {
     public void assertThatChangedPatternIsAudited() {
 
         setAdminRole();
-        when(mockedStore.get()).thenReturn(null);
         LogbackCapturingAppender capturing = LogbackCapturingAppender.weaveInto(TagProtectionConfigurationStore.logger);
-
-        String newProtectionPattern = "protect/*";
 
         TagProtectionConfig config = new TagProtectionConfig();
 
@@ -76,12 +73,15 @@ public class TagProtectionConfigurationStoreTest {
         assertThat(capturing.getCapturedLogMessages()).isEmpty();
 
         //however, if the pattern changes, it will be audited
-        config.setProtectionPattern(newProtectionPattern);
-        cut.saveConfiguration(config);
+        TagProtectionConfig changedConfig = new TagProtectionConfig();
+        String newProtectionPattern = "protect/*";
+        changedConfig.setProtectionPattern(newProtectionPattern);
+        cut.saveConfiguration(changedConfig);
 
-        assertThat(capturing.getCapturedLogMessages().get(0)).contains(ADMIN_USER_NAME);
-        assertThat(capturing.getCapturedLogMessages().get(0)).contains("<>");
-        assertThat(capturing.getCapturedLogMessages().get(0)).contains(String.format("<%s>", newProtectionPattern));
+        String capturedLogMessage = capturing.getCapturedLogMessages().get(0);
+        assertThat(capturedLogMessage).contains(ADMIN_USER_NAME);
+        assertThat(capturedLogMessage).contains("<>");
+        assertThat(capturedLogMessage).contains(String.format("<%s>", newProtectionPattern));
     }
 
     private void setAdminRole() {
