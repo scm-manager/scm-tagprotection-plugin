@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!DOCTYPE plugin SYSTEM "https://download.scm-manager.org/dtd/plugin/2.0.0-01.dtd">
 <!--
 
@@ -33,17 +34,16 @@
 -->
 <plugin>
 
-  <information>
-    <author>Oliver Milke</author>
+  <scm-version>2</scm-version>
 
-    <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
-    <wiki>https://github.com/cloudogu/scm-tagprotection-plugin/wiki</wiki>
+  <information>
+    <displayName>Tag Protection</displayName>
+    <author>Oliver Milke</author>
+    <category>Authorization</category>
   </information>
 
   <conditions>
     <min-version>${project.parent.version}</min-version>
   </conditions>
-
-  <scm-version>2</scm-version>
 
 </plugin>

@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <artifactId>scm-plugins</artifactId>
         <groupId>sonia.scm.plugins</groupId>
@@ -15,7 +14,7 @@
     <name>${project.artifactId}</name>
     <packaging>smp</packaging>
     <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
-    <description>This plugin enables configurable protection against removal of tags for repositories in SCM Manager.</description>
+    <description>Enables configurable protection against removal of tags for repositories in SCM-Manager</description>
 
     <scm>
         <connection>scm:git:https://github.com/cloudogu/scm-tagprotection-plugin</connection>
@@ -109,7 +108,7 @@
                     <plugin>
                         <groupId>sonia.scm.maven</groupId>
                         <artifactId>smp-maven-plugin</artifactId>
-                        <version>1.0.0-alpha-4</version>
+                        <version>1.0.0-alpha-6</version>
                         <extensions>true</extensions>
                         <configuration>
                             <links>
