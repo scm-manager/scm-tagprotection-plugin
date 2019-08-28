@@ -13,13 +13,13 @@
     <version>2.0.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>smp</packaging>
-    <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
+    <url>https://github.com/scm-manager/scm-tagprotection-plugin</url>
     <description>Enables configurable protection against removal of tags for repositories in SCM-Manager</description>
 
     <scm>
-        <connection>scm:git:https://github.com/cloudogu/scm-tagprotection-plugin</connection>
-        <developerConnection>scm:git:https://github.com/cloudogu/scm-tagprotection-plugin</developerConnection>
-        <url>https://github.com/cloudogu/scm-tagprotection-plugin</url>
+        <connection>scm:git:https://github.com/scm-manager/scm-tagprotection-plugin</connection>
+        <developerConnection>scm:git:https://github.com/scm-manager/scm-tagprotection-plugin</developerConnection>
+        <url>https://github.com/scm-manager/scm-tagprotection-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
