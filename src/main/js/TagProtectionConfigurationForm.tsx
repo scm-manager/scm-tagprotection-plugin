@@ -1,17 +1,13 @@
-// @flow
 import React from "react";
-import { translate } from "react-i18next";
-import type { TagProtectionConfiguration } from "./TagProtectionConfiguration";
+import { WithTranslation, withTranslation } from "react-i18next";
+import { TagProtectionConfiguration } from "./TagProtectionConfiguration";
 import { InputField, Checkbox } from "@scm-manager/ui-components";
 
-type Props = {
-  initialConfiguration: TagProtectionConfiguration,
-  readOnly: boolean,
-  onConfigurationChange: (TagProtectionConfiguration, boolean) => void,
-  transportStrategy: string,
-
-  // context prop
-  t: string => string
+type Props = WithTranslation & {
+  initialConfiguration: TagProtectionConfiguration;
+  readOnly: boolean;
+  onConfigurationChange: (p1: TagProtectionConfiguration, p2: boolean) => void;
+  transportStrategy: string;
 };
 
 type State = TagProtectionConfiguration;
@@ -26,11 +22,16 @@ class TagProtectionConfigurationForm extends React.Component<Props, State> {
 
   configChangeHandler = (value: string, name: string) => {
     this.setState(
-        {
-          [name]: value
-        },
-        () =>
-            this.props.onConfigurationChange({ ...this.state }, true)
+      {
+        [name]: value
+      },
+      () =>
+        this.props.onConfigurationChange(
+          {
+            ...this.state
+          },
+          true
+        )
     );
   };
 
@@ -41,9 +42,7 @@ class TagProtectionConfigurationForm extends React.Component<Props, State> {
         <InputField
           name={"protectionPattern"}
           label={t("scm-tagProtection-plugin.config.form.protectionPattern")}
-          helpText={t(
-            "scm-tagProtection-plugin.config.form.protectionPattern-helptext"
-          )}
+          helpText={t("scm-tagProtection-plugin.config.form.protectionPattern-helptext")}
           disabled={readOnly}
           value={this.state["protectionPattern"]}
           onChange={this.configChangeHandler}
@@ -51,9 +50,7 @@ class TagProtectionConfigurationForm extends React.Component<Props, State> {
         <Checkbox
           name={"reduceOwnerPrivilege"}
           label={t("scm-tagProtection-plugin.config.form.reduceOwnerPrivilege")}
-          helpText={t(
-            "scm-tagProtection-plugin.config.form.reduceOwnerPrivilege-helptext"
-          )}
+          helpText={t("scm-tagProtection-plugin.config.form.reduceOwnerPrivilege-helptext")}
           checked={this.state["reduceOwnerPrivilege"]}
           onChange={this.configChangeHandler}
           disabled={readOnly}
@@ -61,7 +58,6 @@ class TagProtectionConfigurationForm extends React.Component<Props, State> {
       </>
     );
   }
-
 }
 
-export default translate("plugins")(TagProtectionConfigurationForm);
+export default withTranslation("plugins")(TagProtectionConfigurationForm);
