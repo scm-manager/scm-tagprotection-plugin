@@ -44,7 +44,6 @@
         <connection>scm:git:https://github.com/scm-manager/scm-tagprotection-plugin</connection>
         <developerConnection>scm:git:https://github.com/scm-manager/scm-tagprotection-plugin</developerConnection>
         <url>https://github.com/scm-manager/scm-tagprotection-plugin</url>
-        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
@@ -94,6 +93,15 @@
                     <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
+          <plugin>
+            <groupId>io.openapitools.swagger</groupId>
+            <artifactId>swagger-maven-plugin</artifactId>
+            <configuration>
+              <resourcePackages>
+                <resourcePackage>sonia.scm.tagprotection</resourcePackage>
+              </resourcePackages>
+            </configuration>
+          </plugin>
 
         </plugins>
     </build>

@@ -27,6 +27,7 @@ import com.thekua.spikes.LogbackCapturingAppender;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import sonia.scm.store.ConfigurationStore;
@@ -44,79 +45,84 @@ import static sonia.scm.tagprotection.TagProtectionConfigurationStore.STORE_TYPE
  */
 public class TagProtectionConfigurationStoreTest {
 
-    private static final String ADMIN_USER_NAME = "AdminUser";
+  private static final String ADMIN_USER_NAME = "AdminUser";
 
-    private TagProtectionConfigurationStore cut;
-    private ConfigurationStore<TagProtectionConfig> mockedStore;
+  private TagProtectionConfigurationStore cut;
+  private ConfigurationStore<TagProtectionConfig> mockedStore;
 
-    @Before
-    public void prepareTest() {
+  @Before
+  public void prepareTest() {
 
-        ConfigurationStoreFactory factory = new InMemoryConfigurationStoreFactory();
-        mockedStore = factory.withType(TagProtectionConfig.class).withName(STORE_TYPE).build();
+    ConfigurationStoreFactory factory = new InMemoryConfigurationStoreFactory();
+    mockedStore = factory.withType(TagProtectionConfig.class).withName(STORE_TYPE).build();
 
-        cut = new TagProtectionConfigurationStore(factory);
-    }
+    cut = new TagProtectionConfigurationStore(factory);
+  }
 
-    @Test
-    public void assertThatDefaultConfigurationIsProvided() {
+  @After
+  public void cleanupContext() {
+    ThreadContext.unbindSubject();
+  }
 
-        TagProtectionConfig configuration = cut.getConfiguration();
+  @Test
+  public void assertThatDefaultConfigurationIsProvided() {
 
-        //prove that without a persisted configuration, the values match with the default values as defined by TagProtectionConfig
+    TagProtectionConfig configuration = cut.getConfiguration();
 
-        assertThat(configuration.getProtectionPattern()).isEqualTo(new TagProtectionConfig().getProtectionPattern());
-        assertThat(configuration.isReduceOwnerPrivilege()).isEqualTo(new TagProtectionConfig().isReduceOwnerPrivilege());
-    }
+    //prove that without a persisted configuration, the values match with the default values as defined by TagProtectionConfig
 
-    @Test
-    public void assertThatPersistedConfigurationIsProvided() {
+    assertThat(configuration.getProtectionPattern()).isEqualTo(new TagProtectionConfig().getProtectionPattern());
+    assertThat(configuration.isReduceOwnerPrivilege()).isEqualTo(new TagProtectionConfig().isReduceOwnerPrivilege());
+  }
 
-        TagProtectionConfig persistedConfiguration = new TagProtectionConfig();
-        mockedStore.set(persistedConfiguration);
+  @Test
+  public void assertThatPersistedConfigurationIsProvided() {
 
-        TagProtectionConfig configuration = cut.getConfiguration();
+    TagProtectionConfig persistedConfiguration = new TagProtectionConfig();
+    mockedStore.set(persistedConfiguration);
 
-        //prove that a persisted configuration is returned
-        assertThat(configuration).isSameAs(persistedConfiguration);
-    }
+    TagProtectionConfig configuration = cut.getConfiguration();
 
-    @Test
-    public void assertThatChangedPatternIsAudited() {
+    //prove that a persisted configuration is returned
+    assertThat(configuration).isSameAs(persistedConfiguration);
+  }
 
-        setAdminRole();
-        LogbackCapturingAppender capturing = LogbackCapturingAppender.weaveInto(TagProtectionConfigurationStore.logger);
+  @Test
+  public void assertThatChangedPatternIsAudited() {
 
-        TagProtectionConfig config = new TagProtectionConfig();
+    setAdminRole();
+    LogbackCapturingAppender capturing = LogbackCapturingAppender.weaveInto(TagProtectionConfigurationStore.logger);
 
-        //invert non-audited flag
-        config.setReduceOwnerPrivilege(!config.isReduceOwnerPrivilege());
-        cut.saveConfiguration(config);
+    TagProtectionConfig config = new TagProtectionConfig();
 
-        assertThat(capturing.getCapturedLogMessages()).isEmpty();
+    //invert non-audited flag
+    config.setReduceOwnerPrivilege(!config.isReduceOwnerPrivilege());
+    cut.saveConfiguration(config);
 
-        //however, if the pattern changes, it will be audited
-        TagProtectionConfig changedConfig = new TagProtectionConfig();
-        String newProtectionPattern = "protect/*";
-        changedConfig.setProtectionPattern(newProtectionPattern);
-        cut.saveConfiguration(changedConfig);
+    assertThat(capturing.getCapturedLogMessages()).isEmpty();
 
-        String capturedLogMessage = capturing.getCapturedLogMessages().get(0);
-        assertThat(capturedLogMessage).contains(ADMIN_USER_NAME);
-        assertThat(capturedLogMessage).contains("<>");
-        assertThat(capturedLogMessage).contains(String.format("<%s>", newProtectionPattern));
-    }
+    //however, if the pattern changes, it will be audited
+    TagProtectionConfig changedConfig = new TagProtectionConfig();
+    String newProtectionPattern = "protect/*";
+    changedConfig.setProtectionPattern(newProtectionPattern);
+    cut.saveConfiguration(changedConfig);
 
-    private void setAdminRole() {
-        Subject adminSubject = mock(Subject.class);
+    String capturedLogMessage = capturing.getCapturedLogMessages().get(0);
+    assertThat(capturedLogMessage).contains(ADMIN_USER_NAME);
+    assertThat(capturedLogMessage).contains("<>");
+    assertThat(capturedLogMessage).contains(String.format("<%s>", newProtectionPattern));
+  }
 
-        //provide a username for the subject
-        PrincipalCollection mockedPrincipals = mock(PrincipalCollection.class);
-        when(mockedPrincipals.oneByType(User.class)).thenReturn(new User(ADMIN_USER_NAME));
+  private void setAdminRole() {
+    Subject adminSubject = mock(Subject.class);
 
-        when(adminSubject.getPrincipals()).thenReturn(mockedPrincipals);
-        ThreadContext.bind(adminSubject);
-    }
+    //provide a username for the subject
+    PrincipalCollection mockedPrincipals = mock(PrincipalCollection.class);
+    when(mockedPrincipals.oneByType(User.class)).thenReturn(new User(ADMIN_USER_NAME));
+
+    when(adminSubject.getPrincipals()).thenReturn(mockedPrincipals);
+    ThreadContext.bind(adminSubject);
+  }
 
 
 }
