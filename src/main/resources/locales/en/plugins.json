@@ -16,7 +16,7 @@
       "read,write": {
         "tagprotection": {
           "displayName": "Modify globally protected tags",
-          "description": "May modify the globally protected tags"
+          "description": "May modifies the globally protected tags"
         }
       }
     }
