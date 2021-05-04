@@ -27,6 +27,10 @@ plugins {
   id 'org.scm-manager.smp' version '0.8.0'
 }
 
+repositories {
+  maven { url "https://jitpack.io"}
+}
+
 dependencies {
   testImplementation "sonia.scm:scm-test:${scmPlugin.scmVersion}"
   testImplementation "com.google.truth:truth:0.34"
