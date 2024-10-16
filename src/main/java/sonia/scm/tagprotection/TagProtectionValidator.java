@@ -20,53 +20,47 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import sonia.scm.config.ConfigurationPermissions;
+import sonia.scm.plugin.Extension;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryPermissions;
 import sonia.scm.repository.Tag;
+import sonia.scm.repository.TagGuard;
+import sonia.scm.repository.TagGuardDeletionRequest;
 import sonia.scm.util.GlobUtil;
-
-import java.util.List;
 
 /**
  * This Validator decides whether the removal of given tags is allowed for a repository or must be rejected.
  * This is done with respect to user requesting the removal. the current user is obtained via {@link SecurityUtils#getSubject()}.
- *
- * @author Oliver Milke
  */
-public class TagProtectionValidator {
+@Extension
+public class TagProtectionValidator implements TagGuard {
 
     private TagProtectionConfigurationStore store;
 
     @Inject
     public TagProtectionValidator(TagProtectionConfigurationStore store) {
-
         this.store = store;
     }
 
     /**
-     * Checks whether a rejection of the requested removal must take place.
+     * Checks whether a tag may be deleted.
      *
-     * @param repository The repository to check.
-     * @param tags       The tags requested for removal.
-     * @return Returns {@code true}, if any of the tags must be protected from removal. Returns {@code false} if no intervention is required.
+     * @param tagGuardDeletionRequest The request to check whether a tag should be deleted for a repository.
+     * @return Returns {@code false}, if the tags must be protected from removal. Returns {@code true} if no intervention is required.
      */
-    public boolean tagsMustBeProtected(Repository repository, List<Tag> tags) {
-
-        //short circuit checks
-        if (tags.isEmpty()) {
-            return false;
-        }
+    @Override
+    public boolean canDelete(TagGuardDeletionRequest tagGuardDeletionRequest) {
 
         if (featuredIsEffectivelyDisabled()) {
-            return false;
+            return true;
         }
 
-        if (currentUserHasDeletePrivilege(repository)) {
-            return false;
+        if (currentUserHasDeletePrivilege(tagGuardDeletionRequest.getRepository())) {
+            return true;
         }
 
         //regular pattern checking
-        return anyTagIsOnProtectionList(tags);
+        return !tagIsOnProtectionList(tagGuardDeletionRequest.getDeletedTag());
     }
 
     /**
@@ -103,24 +97,6 @@ public class TagProtectionValidator {
     }
 
     /**
-     * Decides if any of the provided tags matches configured pattern.
-     *
-     * @param tags The list of tags tag that is checked.
-     * @return Returns {@code true} if a single tag matches cannot be removed. Returns false otherwise.
-     */
-    private boolean anyTagIsOnProtectionList(List<Tag> tags) {
-
-        for (Tag currentTag : tags) {
-            if (tagIsOnProtectionList(currentTag)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
      * Decides whether or not a specific tag matches the protection pattern. Pattern is checked as glob (basically allowing * and ? as wildcards).
      *
      * @return Returns {@code true}, if this tag matches the protection pattern.
@@ -152,5 +128,4 @@ public class TagProtectionValidator {
 
         return store.getConfiguration().getProtectionPattern();
     }
-
 }

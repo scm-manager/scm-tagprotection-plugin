@@ -23,159 +23,133 @@ import org.junit.Rule;
 import org.junit.Test;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.Tag;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import sonia.scm.repository.TagGuardDeletionRequest;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Oliver Milke
- */
 @SubjectAware(configuration = "classpath:sonia/scm/tagprotection/shiro.ini")
 public class TagProtectionValidatorTest {
 
-    private static final Repository REPOSITORY = new Repository("id", "git", "space", "X");
+  private static final Repository REPOSITORY = new Repository("id", "git", "space", "X");
 
-    @Rule
-    public ShiroRule shiroRule = new ShiroRule();
+  @Rule
+  public ShiroRule shiroRule = new ShiroRule();
 
-    private TagProtectionConfig preparedConfiguration;
-    private TagProtectionValidator cut;
+  private TagProtectionConfig preparedConfiguration;
+  private TagProtectionValidator cut;
 
-    @Before
-    public void prepareTest() {
+  @Before
+  public void prepareTest() {
 
-        //the configuration is mutable, which allows to set the configuration per test on the fly.
-        preparedConfiguration = new TagProtectionConfig();
+    //the configuration is mutable, which allows to set the configuration per test on the fly.
+    preparedConfiguration = new TagProtectionConfig();
 
-        TagProtectionConfigurationStore mockedConfigStore = mock(TagProtectionConfigurationStore.class);
-        when(mockedConfigStore.getConfiguration()).thenReturn(preparedConfiguration);
+    TagProtectionConfigurationStore mockedConfigStore = mock(TagProtectionConfigurationStore.class);
+    when(mockedConfigStore.getConfiguration()).thenReturn(preparedConfiguration);
 
-        cut = new TagProtectionValidator(mockedConfigStore);
-    }
+    cut = new TagProtectionValidator(mockedConfigStore);
+  }
 
-    @Test
-    @SubjectAware(username = "trillian", password = "secret")
-    public void assertThatAdminCanRemoveProtectedTags() {
+  @Test
+  @SubjectAware(username = "trillian", password = "secret")
+  public void assertThatAdminCanRemoveProtectedTags() {
 
-        preparedConfiguration.setProtectionPattern("t1");
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    preparedConfiguration.setProtectionPattern("t1");
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //pattern configured and matching a given tag. But user is admin, hence no protection needed
-        assertThat(result).isFalse();
-    }
+    //pattern configured and matching a given tag. But user is admin, hence no protection needed
+    assertThat(result).isTrue();
+  }
 
-    @Test
-    @SubjectAware(username = "marvin", password = "secret")
-    public void assertThatOwnerCanRemoveTags() {
+  @Test
+  @SubjectAware(username = "marvin", password = "secret")
+  public void assertThatOwnerCanRemoveTags() {
 
-        preparedConfiguration.setProtectionPattern("t1");
-        preparedConfiguration.setReduceOwnerPrivilege(false);
+    preparedConfiguration.setProtectionPattern("t1");
+    preparedConfiguration.setReduceOwnerPrivilege(false);
 
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //pattern configured and matching a given tag. But user is Owner and privilege reduction is not configured, hence no protection needed
-        assertThat(result).isFalse();
-    }
+    //pattern configured and matching a given tag. But user is Owner and privilege reduction is not configured, hence no protection needed
+    assertThat(result).isTrue();
+  }
 
-    @Test
-    @SubjectAware(username = "marvin", password = "secret")
-    public void assertThatReducedOwnerCannotRemoveTags() {
+  @Test
+  @SubjectAware(username = "marvin", password = "secret")
+  public void assertThatReducedOwnerCannotRemoveTags() {
 
-        preparedConfiguration.setProtectionPattern("t1");
-        preparedConfiguration.setReduceOwnerPrivilege(true);
+    preparedConfiguration.setProtectionPattern("t1");
+    preparedConfiguration.setReduceOwnerPrivilege(true);
 
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //pattern configured and matching a given tag. But user is Owner, but reduction is configured, hence  protection is needed
-        assertThat(result).isTrue();
-    }
+    //pattern configured and matching a given tag. But user is Owner, but reduction is configured, hence  protection is needed
+    assertThat(result).isFalse();
+  }
 
-    @Test
-    @SubjectAware(username = "unpriv", password = "secret")
-    public void assertThatEmptyTagListRequiresNoProtection() throws Exception {
+  @Test
+  @SubjectAware(username = "unpriv", password = "secret")
+  public void assertThatEmptyPatternRequiresNoProtection() {
 
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, Collections.EMPTY_LIST);
+    preparedConfiguration.setProtectionPattern("");
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //no tags to handle, no protection needed
-        assertThat(result).isFalse();
-    }
+    //no pattern configured, no protection needed
+    assertThat(result).isTrue();
+  }
 
-    @Test
-    @SubjectAware(username = "unpriv", password = "secret")
-    public void assertThatEmptyPatternRequiresNoProtection() {
+  @Test
+  @SubjectAware(username = "unpriv", password = "secret")
+  public void assertThatNonMatchingPatternRequiresNoProtection() {
 
-        preparedConfiguration.setProtectionPattern("");
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    preparedConfiguration.setProtectionPattern("any");
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //no pattern configured, no protection needed
-        assertThat(result).isFalse();
-    }
+    //configured pattern does not match any of the tags, no protection needed
+    assertThat(result).isTrue();
+  }
 
-    @Test
-    @SubjectAware(username = "unpriv", password = "secret")
-    public void assertThatNonMatchingPatternRequiresNoProtection() {
+  @Test
+  @SubjectAware(username = "unpriv", password = "secret")
+  public void assertThatMatchingPatternRequiresProtection() {
 
-        preparedConfiguration.setProtectionPattern("any");
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    preparedConfiguration.setProtectionPattern("t1");
+    boolean result = cut.canDelete(new TagGuardDeletionRequest(REPOSITORY, tag("t1")));
 
-        //configured pattern does not match any of the tags, no protection needed
-        assertThat(result).isFalse();
-    }
+    //no pattern configured, no protection needed
+    assertThat(result).isFalse();
+  }
 
-    @Test
-    @SubjectAware(username = "unpriv", password = "secret")
-    public void assertThatMatchingPatternRequiresProtection() {
+  @Test
+  public void assertThatWildCardIsProperlyMatching() {
 
-        preparedConfiguration.setProtectionPattern("t1");
-        boolean result = cut.tagsMustBeProtected(REPOSITORY, tagsOf("t1", "t2"));
+    preparedConfiguration.setProtectionPattern("*");
 
-        //no pattern configured, no protection needed
-        assertThat(result).isTrue();
-    }
+    boolean result = cut.tagIsOnProtectionList(new Tag("this-is-just-some-dummy", "1.0"));
+    assertThat(result).isTrue();
 
-    @Test
-    public void assertThatWildCardIsProperlyMatching() throws Exception {
+    preparedConfiguration.setProtectionPattern("release/*");
 
-        preparedConfiguration.setProtectionPattern("*");
+    result = cut.tagIsOnProtectionList(new Tag("release/any-release", "1.0"));
+    assertThat(result).isTrue();
 
-        boolean result = cut.tagIsOnProtectionList(new Tag("this-is-just-some-dummy", "1.0"));
-        assertThat(result).isTrue();
+    result = cut.tagIsOnProtectionList(new Tag("release", "1.0"));
+    assertThat(result).isFalse();
 
-        preparedConfiguration.setProtectionPattern("release/*");
+    preparedConfiguration.setProtectionPattern("release/?.?");
 
-        result = cut.tagIsOnProtectionList(new Tag("release/any-release", "1.0"));
-        assertThat(result).isTrue();
+    result = cut.tagIsOnProtectionList(new Tag("release/1.0", "1.0"));
+    assertThat(result).isTrue();
 
-        result = cut.tagIsOnProtectionList(new Tag("release", "1.0"));
-        assertThat(result).isFalse();
+    result = cut.tagIsOnProtectionList(new Tag("release/1A", "1.0"));
+    assertThat(result).isFalse();
 
-        preparedConfiguration.setProtectionPattern("release/?.?");
+    //these are just some basic test, assuming GlobUtil is extensively tested
+  }
 
-        result = cut.tagIsOnProtectionList(new Tag("release/1.0", "1.0"));
-        assertThat(result).isTrue();
-
-        result = cut.tagIsOnProtectionList(new Tag("release/1A", "1.0"));
-        assertThat(result).isFalse();
-
-        //these are just some basic test, assuming GlobUtil is extensively tested
-    }
-
-    private List<Tag> tagsOf(String... names) {
-
-        List<Tag> result = new ArrayList<>();
-
-        for (String name : names) {
-
-            result.add(new Tag(name, "1.0"));
-        }
-
-        return result;
-    }
-
-
+  private Tag tag(String name) {
+    return new Tag(name, "1");
+  }
 }
