@@ -29,7 +29,7 @@ dependencies {
 }
 
 scmPlugin {
-  scmVersion = "3.6.0"
+  scmVersion = "3.7.0"
   displayName = "Tag Protection"
   description = "Enables configurable protection against removal of tags for repositories in SCM-Manager"
   author = "Oliver Milke"

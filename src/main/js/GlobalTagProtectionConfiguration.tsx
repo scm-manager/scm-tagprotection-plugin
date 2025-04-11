@@ -14,25 +14,25 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-import React from "react";
+import React, { FC } from "react";
 import { Title, Configuration } from "@scm-manager/ui-components";
-import { WithTranslation, withTranslation } from "react-i18next";
 import TagProtectionConfigurationForm from "./TagProtectionConfigurationForm";
+import { useTranslation } from "react-i18next";
+import { useDocumentTitle } from "@scm-manager/ui-core";
 
-type Props = WithTranslation & {
+type Props = {
   link: string;
 };
 
-class GlobalTagProtectionConfiguration extends React.Component<Props> {
-  render() {
-    const { t, link } = this.props;
-    return (
-      <>
-        <Title title={t("scm-tagProtection-plugin.config.form.header")} />
-        <Configuration link={link} render={props => <TagProtectionConfigurationForm {...props} />} />
-      </>
-    );
-  }
-}
+const GlobalTagProtectionConfiguration: FC<Props> = ({ link }) => {
+  const [t] = useTranslation("plugins");
+  useDocumentTitle(t("scm-tagProtection-plugin.nav-link"));
+  return (
+    <>
+      <Title title={t("scm-tagProtection-plugin.config.form.header")} />
+      <Configuration link={link} render={props => <TagProtectionConfigurationForm {...props} />} />
+    </>
+  );
+};
 
-export default withTranslation("plugins")(GlobalTagProtectionConfiguration);
+export default GlobalTagProtectionConfiguration;
