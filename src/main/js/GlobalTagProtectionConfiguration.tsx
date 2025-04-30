@@ -18,7 +18,6 @@ import React, { FC } from "react";
 import { Title, Configuration } from "@scm-manager/ui-components";
 import TagProtectionConfigurationForm from "./TagProtectionConfigurationForm";
 import { useTranslation } from "react-i18next";
-import { useDocumentTitle } from "@scm-manager/ui-core";
 
 type Props = {
   link: string;
@@ -26,7 +25,7 @@ type Props = {
 
 const GlobalTagProtectionConfiguration: FC<Props> = ({ link }) => {
   const [t] = useTranslation("plugins");
-  useDocumentTitle(t("scm-tagProtection-plugin.nav-link"));
+
   return (
     <>
       <Title title={t("scm-tagProtection-plugin.config.form.header")} />
