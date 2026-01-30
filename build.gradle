@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
   testImplementation "sonia.scm:scm-test:${scmPlugin.scmVersion}"
-  testImplementation "com.google.truth:truth:0.34"
+  testImplementation "com.google.truth:truth:1.4.5"
   testImplementation "com.github.schnatterer:logback-spike:1.0.0"
 }
 
