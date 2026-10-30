@@ -77,7 +77,7 @@ public class TagProtectionConfigurationStoreTest {
     TagProtectionConfig configuration = cut.getConfiguration();
 
     //prove that a persisted configuration is returned
-    assertThat(configuration).isSameAs(persistedConfiguration);
+    assertThat(configuration).isSameInstanceAs(persistedConfiguration);
   }
 
   @Test
